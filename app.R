@@ -1,11 +1,11 @@
 # install libraries
 if(!require("shiny")) install.packages("shiny")
 if(!require("bslib")) install.packages("bslib")
-if(!require("ggplot")) install.packages("ggplot")
+if(!require("ggplot2")) install.packages("ggplot2")
 if(!require("dplyr")) install.packages("dplyr")
 if(!require("tidyr")) install.packages("tidyr")
 if(!require("reactable")) install.packages("reactable")
-
+if(!require("DT")) install.packages("DT")
 
 # Load libraries
 library(dplyr)
@@ -16,6 +16,7 @@ library(shinythemes)
 library(shinyWidgets)
 library(shinyFeedback)
 library(reactable)
+library(DT)
 
 # load data
 data(iris)
@@ -47,12 +48,12 @@ ui <-
                     card_header(""),
                     full_screen = T,
                     card_body(dataTableOutput("") ),
-                  ),
+                    ),
                   #MIGUEL > DT
                   card(
-                    card_header(""),
+                    card_header("DT example"),
                     full_screen = T,
-                    card_body(dataTableOutput("") ),
+                    card_body(dataTableOutput("table1")),
                   ),
                   #RUBEN > HIGHCHARTER
                   card(
@@ -75,7 +76,7 @@ ui <-
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
   filtered_sepal <- eventReactive(input$sepal, {
-    filtered_sepal() |> 
+    iris |> 
       dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
     
   })
@@ -95,7 +96,15 @@ server <- function(input, output) {
   
   #ARPAD
   output$table3 <- renderReactable({
-    reactable(iris)
+    reactable(filtered_sepal())
+
+    filtered_data <- iris |>
+    filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
+  
+  # MIGUEL
+  # Render the DT table based on the filtered data
+  output$table1 <- renderDataTable({
+    datatable(filtered_data, filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
   })
 }
 # Run the application -----------------------------------------------------
