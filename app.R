@@ -48,7 +48,7 @@ ui <-
                     card_header(""),
                     full_screen = T,
                     card_body(dataTableOutput("") ),
-                    ),
+                  ),
                   #MIGUEL > DT
                   card(
                     card_header("DT example"),
@@ -75,15 +75,6 @@ ui <-
   )
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
-<<<<<<< HEAD
-=======
-  filtered_sepal <- eventReactive(input$sepal, {
-    iris |> 
-      dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
-    
-  })
-  
->>>>>>> cd5aa8c28481f935470f28ad6059e9297259b953
   #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
   
   #ARPAD
@@ -94,11 +85,11 @@ server <- function(input, output) {
   output$table3 <- renderReactable({
     reactable(filtered_sepal())
   })
-
+  
   # MIGUEL
   filtered_data <- iris |>
-  filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
-    
+    filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
+  
   # Render the DT table based on the filtered data
   output$table1 <- renderDataTable({
     datatable(filtered_data, 
@@ -109,7 +100,7 @@ server <- function(input, output) {
                            "Petal Width", 
                            "Species"))
   })
-
+  
   #RUBEN
   # eventReactive() to choose a random specie when pressing an input button
   data_filtered_ruben <- eventReactive(input$random_select,{
@@ -120,23 +111,7 @@ server <- function(input, output) {
   observe({
     print(paste("User has clicked on the button",input$random_select,"time(s)"))
   })
-<<<<<<< HEAD
-    
-=======
   
-  #ARPAD
-  output$table3 <- renderReactable({
-    reactable(filtered_sepal())
-
-    filtered_data <- iris |>
-    filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
-  
-  # MIGUEL
-  # Render the DT table based on the filtered data
-  output$table1 <- renderDataTable({
-    datatable(filtered_data, filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
-  })
->>>>>>> cd5aa8c28481f935470f28ad6059e9297259b953
 }
-  # Run the application -----------------------------------------------------
-  shinyApp(ui, server, options = list())
+# Run the application -----------------------------------------------------
+shinyApp(ui, server, options = list())
