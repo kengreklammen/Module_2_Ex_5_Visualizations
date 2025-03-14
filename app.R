@@ -129,22 +129,18 @@ server <- function(input, output) {
   })
   
   # MIGUEL
-  filtered_data <- iris |>
-    filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
-  
+  filtered_dataDT <- reactive({
+    iris |>
+    filter(Species == input$species & Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
+  })
+
   # Render the DT table based on the filtered data
   output$table1 <- renderDataTable({
-    datatable(filtered_data, 
-              filter = "top", 
-              colnames = c("Sepal Length", 
-                           "Sepal Width", 
-                           "Petal Length", 
-                           "Petal Width", 
-                           "Species"))
+    datatable(filtered_dataDT(), filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
   })
   
   #RUBEN
-  # eventReactive() to choose a random specie when pressing an input button
+  # eventReactive() to choose a random species when pressing an input button
   data_filtered_ruben <- eventReactive(input$random_select,{
     iris |>
       dplyr::filter(Species == sample(Species,1))
@@ -153,7 +149,6 @@ server <- function(input, output) {
   observe({
     print(paste("User has clicked on the button",input$random_select,"time(s)"))
   })
-  
   
   #FARIBA
   # Filtered data based on user input 
