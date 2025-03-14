@@ -1,44 +1,48 @@
 # Install libraries (if not already installed)
-install.packages("shiny")
-install.packages("ggplot2")
-install.packages("dplyr")
-install.packages("tidyr")
-install.packages("bslib")
-install.packages("plotly")
+if (!require("shiny")) install.packages("shiny")
+if (!require("bslib")) install.packages("bslib")
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
+if (!require("reactable")) install.packages("reactable")
+if (!require("plotly")) install.packages("plotly")
 
 # Load libraries
-library(shiny)
-library(ggplot2)
 library(dplyr)
-library(tidyr)
+library(tibble)
+library(shiny)
 library(bslib)
+library(shinythemes)
+library(shinyWidgets)
+library(shinyFeedback)
+library(reactable)
 library(plotly)
 
 # Load data
 data(iris)
 
 # Define UI ---------------------------------------------------------------
-ui <- fluidPage(
+ui <- page_fluid(
   # App title
   titlePanel("Iris Dataset"),
   
   # Theme
   theme = bslib::bs_theme(
     bootswatch = "flatly",
-    version = 5
+    version = "5"
   ),
   
   # Sidebar layout with input and output definitions
-  sidebarLayout(
-    sidebarPanel(
-      # Filter 1: Select species
+  navset_card_pill(
+    sidebar = sidebar(
+      # FARIBA: filter1: select > choose species
       selectInput(
         inputId = "species",
         label = "Choose a Species:",
         choices = levels(iris$Species)
       ),
       
-      # Filter 2: Sepal length range
+      # ARPAD: filter2: slider > sepal.length
       sliderInput(
         inputId = "sepal_length",
         label = "Sepal Length Range:",
@@ -47,27 +51,54 @@ ui <- fluidPage(
         value = c(min(iris$Sepal.Length), max(iris$Sepal.Length))
       ),
       
-      # Filter button
+      # RUBEN: button: select random species
       actionButton(
-        inputId = "filter_data",
-        label = "Filter Data"
+        inputId = "random_select",
+        label = "Choose a Random Species"
       )
     ),
     
     # Main panel
-    mainPanel(
-      # Table output 
-      tableOutput(outputId = "filtered_table"),
-      
-      # Violin plot 
-      plotlyOutput("violin_plot")
+    nav_panel(
+      title = "",
+      layout_columns(
+        col_widths = c(6, 6),
+        
+        # FARIBA: Violin plot with Plotly
+        card(
+          card_header("Violin Plot (Sepal Length by Species)"),
+          full_screen = TRUE,
+          card_body(plotlyOutput("violin_plot"))
+        ),
+        
+        # MIGUEL: DT table
+        card(
+          card_header("DT Table"),
+          full_screen = TRUE,
+          card_body(dataTableOutput("dt_table"))
+        ),
+        
+        # RUBEN: Highcharter plot
+        card(
+          card_header("Highcharter Plot"),
+          full_screen = TRUE,
+          card_body(highchartOutput("highcharter_plot"))
+        ),
+        
+        # ARPAD: Reactable table
+        card(
+          card_header("Reactable Table"),
+          full_screen = TRUE,
+          card_body(reactableOutput("reactable_table"))
+        )
+      )
     )
   )
 )
 
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
-  # Filtered data based on user input 
+  # FARIBA: Filter data based on species and sepal length
   filtered_data <- reactive({
     iris %>%
       filter(Species == input$species,
@@ -75,12 +106,7 @@ server <- function(input, output) {
              Sepal.Length <= input$sepal_length[2])
   })
   
-  # Render filtered table 
-  output$filtered_table <- renderTable({
-    filtered_data()
-  })
-  
-  # Render violin plot 
+  # FARIBA: Render violin plot
   output$violin_plot <- renderPlotly({
     fig <- plot_ly(filtered_data(), type = 'violin')
     
@@ -134,7 +160,34 @@ server <- function(input, output) {
     
     fig
   })
+  
+  # MIGUEL: Render DT table
+  output$dt_table <- renderDataTable({
+    filtered_data()
+  })
+  
+  # RUBEN: Render Highcharter plot
+  output$highcharter_plot <- renderHighchart({
+    highchart() %>%
+      hc_add_series(data = filtered_data()$Sepal.Length, type = "column")
+  })
+  
+  # ARPAD: Render Reactable table
+  output$reactable_table <- renderReactable({
+    reactable(filtered_data())
+  })
+  
+  # RUBEN: Random species selection
+  data_filtered_ruben <- eventReactive(input$random_select, {
+    iris |>
+      filter(Species == sample(Species, 1))
+  })
+  
+  # RUBEN: Log button clicks
+  observe({
+    print(paste("User has clicked on the button", input$random_select, "time(s)"))
+  })
 }
 
 # Run the application -----------------------------------------------------
-shinyApp(ui, server)
+shinyApp(ui, server, options = list())
