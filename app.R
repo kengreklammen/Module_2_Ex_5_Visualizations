@@ -1,9 +1,3 @@
-# install libraries
-# install.packages("shiny")
-# install.packages("dplyr")
-# install.packages("tidyr")
-# install.packages("bslib")
-
 
 # Load libraries
 library(dplyr)
@@ -38,7 +32,7 @@ ui <-
         
           #Choose a random specie
           actionButton("random_select",
-                       "Choose a random species")
+                       "Choose a random specie")
         ),
         nav_panel(title = "",
                 layout_columns(
