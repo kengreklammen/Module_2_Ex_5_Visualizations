@@ -1,8 +1,15 @@
 # install libraries
-install.packages("shiny")
-install.packages("ggplot2")
-install.packages("dplyr")
-install.packages("tidyr")
+
+if(!require("shiny")) install.packages("shiny")
+if(!require("bslib")) install.packages("bslib")
+if(!require("ggplot")) install.packages("ggplot")
+if(!require("dplyr")) install.packages("dplyr")
+if(!require("tidyr")) install.packages("tidyr")
+if(!require("reactable")) install.packages("reactable")
+
+library(shiny)
+library(reactable)
+
 
 # load data
 data(iris)
@@ -22,6 +29,8 @@ ui <-
         # FARIBA: filter1: select > choose species
         # ARPAD: filter2: slider > sepal.length
         # RUBEN: button: select random species
+        
+        sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),
       ),
       nav_panel(title = "",
                 layout_columns(
@@ -48,7 +57,7 @@ ui <-
                   card(
                     card_header(""),
                     full_screen = T,
-                    card_body(dataTableOutput("") ),
+                    card_body(reactableOutput("table3")),
                   ),
                 ),
       ),
@@ -58,8 +67,16 @@ ui <-
   )
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
+  filtered_sepal <- eventReactive(input$sepal, {
+    filtered_sepal() |> 
+      dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
+    
+  })
   
   #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
+  output$table3 <- renderReactable({
+    reactable(iris)
+  })
 }
 # Run the application -----------------------------------------------------
 shinyApp(ui, server, options = list())
