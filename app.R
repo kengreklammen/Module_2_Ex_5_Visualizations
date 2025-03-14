@@ -6,7 +6,15 @@ if(!require("dplyr")) install.packages("dplyr")
 if(!require("tidyr")) install.packages("tidyr")
 if(!require("reactable")) install.packages("reactable")
 
+
+# Load libraries
+library(dplyr)
+library(tibble)
 library(shiny)
+library(bslib)
+library(shinythemes)
+library(shinyWidgets)
+library(shinyFeedback)
 library(reactable)
 
 # load data
@@ -26,12 +34,12 @@ ui <-
       sidebar = sidebar(
         # FARIBA: filter1: select > choose species
         # ARPAD: filter2: slider > sepal.length
+          sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),       
         # RUBEN: button: select random species
-        
-        sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),
-
+          actionButton("random_select",
+                       "Choose a random specie")
       ),
-      nav_panel(title = "",
+        nav_panel(title = "",
                 layout_columns(
                   col_widths = c(6,6),
                   #FARIBA > CHART W/ PLOTLY 
@@ -59,10 +67,9 @@ ui <-
                     card_body(reactableOutput("table3")),
                   ),
                 ),
-      ),
-      nav_spacer(),
-      nav_item(input_dark_mode(id = "dark_mode", mode = "light")),
-    ),
+        nav_spacer(),
+        nav_item(input_dark_mode(id = "dark_mode", mode = "light")),
+        )
   )
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
@@ -73,9 +80,21 @@ server <- function(input, output) {
   })
   
   #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
+
+  #RUBEN
+  # eventReactive() to choose a random specie when pressing an input button
+  data_filtered_ruben <- eventReactive(input$random_select,{
+    iris |>
+      dplyr::filter(Species == sample(Species,1))
+  })
+  # Use observe() to log changes in the console.
+  observe({
+    print(paste("User has clicked on the button",input$random_select,"time(s)"))
+  })
+  
+  #ARPAD
   output$table3 <- renderReactable({
     reactable(iris)
-  })
 }
 # Run the application -----------------------------------------------------
 shinyApp(ui, server, options = list())
