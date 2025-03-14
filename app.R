@@ -75,7 +75,7 @@ ui <-
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
   filtered_sepal <- eventReactive(input$sepal, {
-    filtered_sepal() |> 
+    iris |> 
       dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
     
   })
@@ -95,7 +95,7 @@ server <- function(input, output) {
   
   #ARPAD
   output$table3 <- renderReactable({
-    reactable(iris)
+    reactable(filtered_sepal())
   })
 }
 # Run the application -----------------------------------------------------
