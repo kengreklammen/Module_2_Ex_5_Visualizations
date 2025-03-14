@@ -7,6 +7,7 @@
 library(shiny)
 library(bslib)
 library(DT)
+library(dplyr)
 
 # load data
 data(iris)
@@ -64,21 +65,14 @@ ui <-
 server <- function(input, output) {
   
   #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
-  
-  # filtered_data <- data |>
-  #   filter(data$Species == "setosa" & data$Sepal.Length >= 4.0 & data$Sepal.Length <= 5.0)
+
+  filtered_data <- iris |>
+    filter(Species == "setosa" & Sepal.Length >= 4.0 & Sepal.Length <= 5.0)
   
   # Render the DT table based on the filtered data
-  output$table1 <- renderDataTable(iris)
-  
-  # , options = list(), class = "display",
-  #           callback = JS("return table;"), rownames, colnames, container,
-  #           caption = NULL, filter = c("none", "bottom", "top"), escape = TRUE,
-  #           style = "auto", width = NULL, height = NULL, elementId = NULL,
-  #           fillContainer = getOption("DT.fillContainer", NULL),
-  #           autoHideNavigation = getOption("DT.autoHideNavigation", NULL),
-  #           selection = c("multiple", "single", "none"), extensions = list(),
-  #           plugins = NULL, editable = FALSE)
+  output$table1 <- renderDataTable({
+    datatable(filtered_data, filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
+  })
 }
 # Run the application -----------------------------------------------------
 shinyApp(ui, server, options = list())
