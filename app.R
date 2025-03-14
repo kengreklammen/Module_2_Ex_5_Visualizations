@@ -36,54 +36,83 @@ ui <-
         # FARIBA: filter1: select > choose species
         selectInput("species", "Select a species:", choices = unique(iris$Species)),
         # ARPAD: filter2: slider > sepal.length
-          sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),       
+        sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),       
         # RUBEN: button: select random species
-          actionButton("random_select",
-                       "Choose a random species")
+        actionButton("random_select",
+                     "Choose a random specie")
       ),
-        nav_panel(title = "",
+      #MIGUEL > DT
+      nav_panel(title = "DT",
                 layout_columns(
-                  col_widths = c(6,6),
-                  #FARIBA > CHART W/ PLOTLY 
-                  card(
-                    card_header(""),
-                    full_screen = T,
-                    card_body(dataTableOutput("") ),
-                    ),
-                  #MIGUEL > DT
+                  col_widths = c(12),
                   card(
                     card_header("DT example"),
                     full_screen = T,
                     card_body(dataTableOutput("table1")),
                   ),
-                  #RUBEN > HIGHCHARTER
+                )
+      ),
+      #ARPAD > REACTABLE
+      nav_panel(title = "Reactable",
+                layout_columns(
+                  col_widths = c(12),
+                  card(
+                    card_header("Reactable example"),
+                    full_screen = T,
+                    card_body(reactableOutput("table3")),
+                  ), 
+                )
+      ),
+      #RUBEN > HIGHCHARTER
+      nav_panel(title = "Highcharter",
+                layout_columns(
+                  col_widths = c(12),
                   card(
                     card_header(""),
                     full_screen = T,
                     card_body(dataTableOutput("") ),
                   ),
-                  #ARPAD > REACTABLE
+                )
+      ),
+      #FARIBA > CHART W/ PLOTLY 
+      nav_panel(title = "Plotly",
+                layout_columns(
+                  col_widths = c(12),
                   card(
                     card_header(""),
                     full_screen = T,
-                    card_body(reactableOutput("table3")),
-                    ),
-                  )
-                ),
-        nav_spacer(),
-        nav_item(input_dark_mode(id = "dark_mode", mode = "light")),
-      )
+                    card_body(dataTableOutput("") ),
+                  ),
+                )
+      ),
+      nav_spacer(),
+      nav_item(input_dark_mode(id = "dark_mode", mode = "light")),
     )
+  )
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
+  #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
+  
+  #ARPAD
   filtered_sepal <- eventReactive(input$sepal, {
     iris |> 
       dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
-    
+  })
+  output$table3 <- renderReactable({
+    reactable(filtered_sepal())
   })
   
-  #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
+  # MIGUEL
+  filtered_dataDT <- reactive({
+    iris |>
+    filter(Species == input$species & Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
+  })
 
+  # Render the DT table based on the filtered data
+  output$table1 <- renderDataTable({
+    datatable(filtered_dataDT(), filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
+  })
+  
   #RUBEN
   # eventReactive() to choose a random species when pressing an input button
   data_filtered_ruben <- eventReactive(input$random_select,{
@@ -93,22 +122,6 @@ server <- function(input, output) {
   # Use observe() to log changes in the console.
   observe({
     print(paste("User has clicked on the button",input$random_select,"time(s)"))
-  })
-  
-  #ARPAD
-  output$table3 <- renderReactable({
-    reactable(filtered_sepal())
-  })
-
-  # MIGUEL
-  filtered_dataDT <- reactive({
-    iris |>
-    filter(Species == input$species & Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
-  })
-  
-  # Render the DT table based on the filtered data
-  output$table1 <- renderDataTable({
-    datatable(filtered_dataDT(), filter = "top", colnames = c("Sepal Length", "Sepal Width", "Petal Length", "Petal Width", "Species"))
   })
 }
 # Run the application -----------------------------------------------------
