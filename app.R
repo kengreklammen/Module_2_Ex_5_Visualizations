@@ -40,32 +40,47 @@ ui <-
         actionButton("random_select",
                      "Choose a random specie")
       ),
-      nav_panel(title = "",
+      #MIGUEL > DT
+      nav_panel(title = "DT",
                 layout_columns(
-                  col_widths = c(6,6),
-                  #FARIBA > CHART W/ PLOTLY 
-                  card(
-                    card_header(""),
-                    full_screen = T,
-                    card_body(dataTableOutput("") ),
-                  ),
-                  #MIGUEL > DT
+                  col_widths = c(12),
                   card(
                     card_header("DT example"),
                     full_screen = T,
                     card_body(dataTableOutput("table1")),
                   ),
-                  #RUBEN > HIGHCHARTER
+                )
+      ),
+      #ARPAD > REACTABLE
+      nav_panel(title = "Reactable",
+                layout_columns(
+                  col_widths = c(12),
+                  card(
+                    card_header("Reactable example"),
+                    full_screen = T,
+                    card_body(reactableOutput("table3")),
+                  ), 
+                )
+      ),
+      #RUBEN > HIGHCHARTER
+      nav_panel(title = "Highcharter",
+                layout_columns(
+                  col_widths = c(12),
                   card(
                     card_header(""),
                     full_screen = T,
                     card_body(dataTableOutput("") ),
                   ),
-                  #ARPAD > REACTABLE
+                )
+      ),
+      #FARIBA > CHART W/ PLOTLY 
+      nav_panel(title = "Plotly",
+                layout_columns(
+                  col_widths = c(12),
                   card(
-                    card_header("Reactable example"),
+                    card_header(""),
                     full_screen = T,
-                    card_body(reactableOutput("table3")),
+                    card_body(dataTableOutput("") ),
                   ),
                 )
       ),
