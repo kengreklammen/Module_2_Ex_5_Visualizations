@@ -68,14 +68,14 @@ ui <-
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
   filtered_sepal <- eventReactive(input$sepal, {
-    filtered_sepal() |> 
+    iris |> 
       dplyr::filter(Sepal.Length >= input$sepal[1] & Sepal.Length <= input$sepal[2])
     
   })
   
   #EACH TEAM MEMBER TO WRITE THE SERVER LOGIC
   output$table3 <- renderReactable({
-    reactable(iris)
+    reactable(filtered_sepal())
   })
 }
 # Run the application -----------------------------------------------------
