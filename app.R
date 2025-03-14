@@ -1,5 +1,4 @@
 # install libraries
-
 if(!require("shiny")) install.packages("shiny")
 if(!require("bslib")) install.packages("bslib")
 if(!require("ggplot")) install.packages("ggplot")
@@ -9,7 +8,6 @@ if(!require("reactable")) install.packages("reactable")
 
 library(shiny)
 library(reactable)
-
 
 # load data
 data(iris)
@@ -31,6 +29,7 @@ ui <-
         # RUBEN: button: select random species
         
         sliderInput("sepal", "Sepal length:", min = 4.3, max = 7.9, value = c(4.3, 7.9)),
+
       ),
       nav_panel(title = "",
                 layout_columns(
