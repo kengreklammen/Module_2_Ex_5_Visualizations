@@ -67,7 +67,7 @@ ui <-
                 layout_columns(
                   col_widths = c(12),
                   card(
-                    card_header(""),
+                    card_header("Highcharter example"),
                     full_screen = T,
                     card_body(dataTableOutput("") ),
                   ),
