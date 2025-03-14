@@ -65,12 +65,13 @@ ui <-
                     card_header(""),
                     full_screen = T,
                     card_body(reactableOutput("table3")),
-                  ),
+                    ),
+                  )
                 ),
         nav_spacer(),
         nav_item(input_dark_mode(id = "dark_mode", mode = "light")),
-        )
-  )
+      )
+    )
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
   filtered_sepal <- eventReactive(input$sepal, {
@@ -95,6 +96,7 @@ server <- function(input, output) {
   #ARPAD
   output$table3 <- renderReactable({
     reactable(iris)
+  })
 }
 # Run the application -----------------------------------------------------
 shinyApp(ui, server, options = list())
