@@ -18,31 +18,34 @@ library(shinyFeedback)
 library(reactable)
 library(plotly)
 
+
 # Load data
 data(iris)
 
+
+
 # Define UI ---------------------------------------------------------------
-ui <- page_fluid(
+ui <- fluidPage(
   # App title
   titlePanel("Iris Dataset"),
   
   # Theme
   theme = bslib::bs_theme(
     bootswatch = "flatly",
-    version = "5"
+    version = 5
   ),
   
   # Sidebar layout with input and output definitions
-  navset_card_pill(
-    sidebar = sidebar(
-      # FARIBA: filter1: select > choose species
+  sidebarLayout(
+    sidebarPanel(
+      # Filter 1: Select species 
       selectInput(
         inputId = "species",
         label = "Choose a Species:",
         choices = levels(iris$Species)
       ),
       
-      # ARPAD: filter2: slider > sepal.length
+      # Filter 2: Sepal length range (Arpad's part)
       sliderInput(
         inputId = "sepal_length",
         label = "Sepal Length Range:",
@@ -51,45 +54,51 @@ ui <- page_fluid(
         value = c(min(iris$Sepal.Length), max(iris$Sepal.Length))
       ),
       
-      # RUBEN: button: select random species
+      # Filter button (Ruben's part)
       actionButton(
-        inputId = "random_select",
-        label = "Choose a Random Species"
+        inputId = "filter_data",
+        label = "Filter Data"
       )
     ),
     
     # Main panel
-    nav_panel(
-      title = "",
+    mainPanel(
+      # Table output 
+      tableOutput(outputId = "filtered_table"),
+      
+      # Violin plot 
+      plotlyOutput("violin_plot"),
+      
+      # Additional outputs for team members
       layout_columns(
         col_widths = c(6, 6),
         
-        # FARIBA: Violin plot with Plotly
-        card(
-          card_header("Violin Plot (Sepal Length by Species)"),
-          full_screen = TRUE,
-          card_body(plotlyOutput("violin_plot"))
-        ),
-        
-        # MIGUEL: DT table
+        # Card 1: Miguel's part (DT table)
         card(
           card_header("DT Table"),
           full_screen = TRUE,
           card_body(dataTableOutput("dt_table"))
         ),
         
-        # RUBEN: Highcharter plot
+        # Card 2: Ruben's part (Highcharter plot)
         card(
           card_header("Highcharter Plot"),
           full_screen = TRUE,
           card_body(highchartOutput("highcharter_plot"))
         ),
         
-        # ARPAD: Reactable table
+        # Card 3: Arpad's part (Reactable table)
         card(
           card_header("Reactable Table"),
           full_screen = TRUE,
           card_body(reactableOutput("reactable_table"))
+        ),
+        
+        # Card 4: Additional output (optional)
+        card(
+          card_header("Additional Output"),
+          full_screen = TRUE,
+          card_body(plotOutput("additional_plot"))
         )
       )
     )
@@ -98,7 +107,7 @@ ui <- page_fluid(
 
 # Define server logic -----------------------------------------------------
 server <- function(input, output) {
-  # FARIBA: Filter data based on species and sepal length
+  # Filtered data based on user input 
   filtered_data <- reactive({
     iris %>%
       filter(Species == input$species,
@@ -106,7 +115,12 @@ server <- function(input, output) {
              Sepal.Length <= input$sepal_length[2])
   })
   
-  # FARIBA: Render violin plot
+  # Render filtered table 
+  output$filtered_table <- renderTable({
+    filtered_data()
+  })
+  
+  # Render violin plot 
   output$violin_plot <- renderPlotly({
     fig <- plot_ly(filtered_data(), type = 'violin')
     
@@ -161,33 +175,30 @@ server <- function(input, output) {
     fig
   })
   
-  # MIGUEL: Render DT table
+  # Render DT table (Miguel's part)
   output$dt_table <- renderDataTable({
     filtered_data()
   })
   
-  # RUBEN: Render Highcharter plot
+  # Render Highcharter plot (Ruben's part)
   output$highcharter_plot <- renderHighchart({
+    # Add Highcharter code here
     highchart() %>%
       hc_add_series(data = filtered_data()$Sepal.Length, type = "column")
   })
   
-  # ARPAD: Render Reactable table
+  # Render Reactable table (Arpad's part)
   output$reactable_table <- renderReactable({
     reactable(filtered_data())
   })
   
-  # RUBEN: Random species selection
-  data_filtered_ruben <- eventReactive(input$random_select, {
-    iris |>
-      filter(Species == sample(Species, 1))
-  })
-  
-  # RUBEN: Log button clicks
-  observe({
-    print(paste("User has clicked on the button", input$random_select, "time(s)"))
+  # Render additional plot (optional)
+  output$additional_plot <- renderPlot({
+    ggplot(filtered_data(), aes(x = Sepal.Length, y = Petal.Length)) +
+      geom_point() +
+      theme_minimal()
   })
 }
 
 # Run the application -----------------------------------------------------
-shinyApp(ui, server, options = list())
+shinyApp(ui, server)
